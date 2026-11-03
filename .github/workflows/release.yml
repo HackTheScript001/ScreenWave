@@ -53,18 +53,28 @@ jobs:
         run: |
           $ErrorActionPreference = 'Stop'
           $base = 'https://download.tizen.org/sdk/tizenstudio/official'
-          $list = (Invoke-WebRequest "$base/pkg_list_windows-64" -UseBasicParsing).Content
+          $resp = Invoke-WebRequest "$base/pkg_list_windows-64" -UseBasicParsing
+          # The server may send it as a binary download – decode it either way
+          $list = if ($resp.Content -is [byte[]]) { [Text.Encoding]::UTF8.GetString($resp.Content) } else { [string]$resp.Content }
+          $lines = $list -split "\r?\n"
+          Write-Host "Package list: $($lines.Count) lines"
 
-          # The list is blocks of "Key : Value" lines separated by blank lines
-          $pkg = $null
-          foreach ($block in ($list -split "(\r?\n){2,}")) {
-            $fields = @{}
-            foreach ($line in ($block -split "\r?\n")) {
-              if ($line -match '^\s*([^:]+?)\s*:\s*(.*)$') { $fields[$matches[1].Trim()] = $matches[2].Trim() }
+          # Each package starts with a "Package : name" line, followed by "Key : Value" lines
+          $pkg = $null; $cur = $null
+          foreach ($line in $lines) {
+            if ($line -match '^\s*Package\s*:\s*(\S+)\s*$') {
+              if ($cur -and $cur['Package'] -eq 'sdb') { $pkg = $cur; break }
+              $cur = @{ Package = $matches[1] }
             }
-            if ($fields['Package'] -eq 'sdb') { $pkg = $fields; break }
+            elseif ($cur -and $line -match '^\s*([A-Za-z0-9_-]+)\s*:\s*(.*)$') { $cur[$matches[1]] = $matches[2].Trim() }
           }
-          if (-not $pkg) { throw "No 'sdb' package in $base/pkg_list_windows-64" }
+          if (-not $pkg -and $cur -and $cur['Package'] -eq 'sdb') { $pkg = $cur }
+          if (-not $pkg) {
+            Write-Host "First lines:"; $lines | Select-Object -First 25 | ForEach-Object { Write-Host "  $_" }
+            Write-Host "Lines mentioning sdb:"; $lines | Select-String -Pattern 'sdb' | Select-Object -First 25 | ForEach-Object { Write-Host "  $_" }
+            throw "No 'sdb' package in $base/pkg_list_windows-64"
+          }
+          $pkg.GetEnumerator() | Sort-Object Key | ForEach-Object { Write-Host "  $($_.Key): $($_.Value)" }
           Write-Host "sdb $($pkg['Version']) -> $($pkg['Path'])"
 
           $zip = Join-Path $env:RUNNER_TEMP 'sdb.zip'
