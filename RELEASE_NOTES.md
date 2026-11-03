@@ -1,3 +1,8 @@
+What's new in 1.3.0
+- Remove apps on 2021 and newer TVs: these only allow removal through the TV's own Apps settings, so ScreenWave now does it with the TV's remote – it opens Apps › Settings, moves to each app, deletes it, and checks the TV's app list to confirm the right app went. It stops straight away if anything unexpected happens.
+- Connect remote is now on the Remove apps page too.
+- For SecondWave: Teach removal (Teach mode) records how one app is removed on a TV, and confirms the app grid layout before it's ever used automatically.
+
 What's new in 1.2.0
 - Do it for me now uses button presses built into ScreenWave for your TV's year, so there's nothing to set up – click it and the remote does it. (Recordings for 2021 TVs are coming in the next update.)
 - Teach is now behind a Teach mode switch, for recording new TV years.

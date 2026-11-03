@@ -250,6 +250,7 @@ public partial class TipsView : UserControl
     private void OnTeachMode(object sender, RoutedEventArgs e)
     {
         if (TeachModeBox.IsChecked != true) CancelTeaching();
+        Routines.TeachMode = TeachModeBox.IsChecked == true;
         ExportButton.Visibility = ImportButton.Visibility = TeachModeBox.IsChecked == true ? Visibility.Visible : Visibility.Collapsed;
         UpdateRemote();
     }

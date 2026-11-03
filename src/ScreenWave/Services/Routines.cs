@@ -18,6 +18,17 @@ public static class Routines
 {
     public static readonly TimeSpan Gap = TimeSpan.FromMilliseconds(1100); // menus animate, so don't rush
 
+    private static bool _teachMode;
+
+    /// <summary>Teach mode shows the Teach buttons (for recording new TV years). Off for normal use.</summary>
+    public static bool TeachMode
+    {
+        get => _teachMode;
+        set { _teachMode = value; TeachModeChanged?.Invoke(); }
+    }
+
+    public static event Action? TeachModeChanged;
+
     private static string FilePath => Path.Combine(AppInfo.DataFolder, "routines.json");
 
     // key ("tizen-6.0" or a model range like "AU8000") → setting → keys
@@ -114,7 +125,12 @@ public static class Routines
             foreach (var (setting, keys) in settings)
             {
                 // Only plain remote buttons are accepted from a file
-                if (keys.Count == 0 || keys.Count > 60 || keys.Any(k => !allowed.Contains(k))) continue;
+                if (keys.Count == 0 || keys.Count > 60) continue;
+                // Layout notes (e.g. "cols=6") for app removal; everything else must be plain remote buttons
+                var ok = setting == RemoteRemoval.LayoutKey
+                    ? keys.All(k => Regex.IsMatch(k, @"^[a-z_]+=[A-Za-z0-9_.]+$"))
+                    : keys.All(allowed.Contains);
+                if (!ok) continue;
                 r[setting] = keys;
                 n++;
             }
