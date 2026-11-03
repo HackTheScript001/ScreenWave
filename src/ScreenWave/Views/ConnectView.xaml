@@ -17,27 +17,84 @@
         <!-- Step A: Developer Mode -->
         <Border Style="{StaticResource Card}" Margin="0,16,0,0" Padding="20,16">
           <StackPanel>
-            <TextBlock Text="A.  Turn on Developer Mode on the TV" FontSize="15" FontWeight="SemiBold"/>
-            <TextBlock TextWrapping="Wrap" Margin="0,8,0,0" LineHeight="21">
-              <Run Text="1.  On the TV, go to Home › Apps."/><LineBreak/>
-              <Run Text="2.  On the Apps screen press 1 2 3 4 5 on the remote. (No number buttons? Press the 123 button, or use the number pad in the SmartThings phone app.)"/><LineBreak/>
-              <Run Text="3.  Switch Developer Mode On and type this PC's address as the Host PC IP:"/>
-            </TextBlock>
-            <ItemsControl x:Name="AddressList" Margin="22,8,0,0">
-              <ItemsControl.ItemTemplate>
-                <DataTemplate>
-                  <TextBlock Margin="0,2">
-                    <Run Text="{Binding AddressText, Mode=OneWay}" FontSize="18" FontWeight="SemiBold" Foreground="{StaticResource Blue}"/>
-                    <Run Text="{Binding AdapterName, Mode=OneWay, StringFormat='   ({0})'}" Foreground="{StaticResource Grey}"/>
-                  </TextBlock>
-                </DataTemplate>
-              </ItemsControl.ItemTemplate>
-            </ItemsControl>
-            <TextBlock x:Name="NoAddressText" Margin="22,4,0,0" Foreground="{StaticResource Warn}" TextWrapping="Wrap" Visibility="Collapsed"
-                       Text="This PC isn't on a network yet. Connect it to the same router as the TV, or use a cable (B below)."/>
-            <TextBlock TextWrapping="Wrap" Margin="0,8,0,0" LineHeight="21">
-              <Run Text="4.  Restart the TV fully: hold the power button on the remote until the Samsung logo appears (just switching it off isn't enough)."/>
-            </TextBlock>
+            <TextBlock Text="A.  Let this PC talk to the TV (one-off, on the TV)" FontSize="15" FontWeight="SemiBold"/>
+            <TextBlock Foreground="{StaticResource Grey}" TextWrapping="Wrap" Margin="0,4,0,0"
+                       Text="Samsung TVs have a hidden setting called Developer Mode. Turning it on and giving it this PC's number lets ScreenWave connect. Do these on the TV with its remote:"/>
+
+            <Grid Margin="0,14,0,0">
+              <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="34"/>
+                <ColumnDefinition Width="*"/>
+              </Grid.ColumnDefinitions>
+              <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+              </Grid.RowDefinitions>
+
+              <Border Grid.Row="0" Width="24" Height="24" CornerRadius="12" Background="{StaticResource Blue}" VerticalAlignment="Top">
+                <TextBlock Text="1" Foreground="White" FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+              </Border>
+              <StackPanel Grid.Row="0" Grid.Column="1" Margin="0,2,0,14">
+                <TextBlock Text="Open the Apps screen" FontWeight="SemiBold"/>
+                <TextBlock TextWrapping="Wrap" Foreground="{StaticResource Grey}"
+                           Text="Press Home on the remote, then pick Apps from the bar along the bottom. You should see the list of apps you can download."/>
+              </StackPanel>
+
+              <Border Grid.Row="1" Width="24" Height="24" CornerRadius="12" Background="{StaticResource Blue}" VerticalAlignment="Top">
+                <TextBlock Text="2" Foreground="White" FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+              </Border>
+              <StackPanel Grid.Row="1" Grid.Column="1" Margin="0,2,0,14">
+                <TextBlock Text="Type 1 2 3 4 5 while you're on the Apps screen" FontWeight="SemiBold"/>
+                <TextBlock TextWrapping="Wrap" Foreground="{StaticResource Grey}"
+                           Text="Nothing shows while you type – that's normal. A box called Developer Mode pops up after the 5. If your remote has no number buttons, press its 123 button to bring up numbers on screen, or use the remote in the SmartThings phone app."/>
+              </StackPanel>
+
+              <Border Grid.Row="2" Width="24" Height="24" CornerRadius="12" Background="{StaticResource Blue}" VerticalAlignment="Top">
+                <TextBlock Text="3" Foreground="White" FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+              </Border>
+              <StackPanel Grid.Row="2" Grid.Column="1" Margin="0,2,0,14">
+                <TextBlock Text="In that box, switch Developer Mode to On" FontWeight="SemiBold"/>
+                <TextBlock TextWrapping="Wrap" Foreground="{StaticResource Grey}"
+                           Text="Then select the box underneath it (it's called Host PC IP) and type in this number:"/>
+                <ItemsControl x:Name="AddressList" Margin="0,8,0,0">
+                  <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                      <Border Background="White" BorderBrush="{StaticResource Line}" BorderThickness="1" CornerRadius="6" Padding="14,8" Margin="0,0,0,6" HorizontalAlignment="Left">
+                        <TextBlock>
+                          <Run Text="{Binding AddressText, Mode=OneWay}" FontSize="22" FontWeight="SemiBold" Foreground="{StaticResource Blue}"/>
+                          <Run Text="{Binding AdapterName, Mode=OneWay, StringFormat='    this PC on {0}'}" Foreground="{StaticResource Grey}"/>
+                        </TextBlock>
+                      </Border>
+                    </DataTemplate>
+                  </ItemsControl.ItemTemplate>
+                </ItemsControl>
+                <TextBlock x:Name="NoAddressText" Foreground="{StaticResource Warn}" TextWrapping="Wrap" Visibility="Collapsed"
+                           Text="This PC isn't on a network yet. Connect it to the same Wi-Fi or router as the TV, or use a cable (B below)."/>
+                <TextBlock TextWrapping="Wrap" Foreground="{StaticResource Grey}" Margin="0,4,0,0"
+                           Text="Use the dots as shown (the TV's on-screen keyboard has a . key). Then press OK."/>
+              </StackPanel>
+
+              <Border Grid.Row="3" Width="24" Height="24" CornerRadius="12" Background="{StaticResource Blue}" VerticalAlignment="Top">
+                <TextBlock Text="4" Foreground="White" FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+              </Border>
+              <StackPanel Grid.Row="3" Grid.Column="1" Margin="0,2,0,14">
+                <TextBlock Text="Restart the TV" FontWeight="SemiBold"/>
+                <TextBlock TextWrapping="Wrap" Foreground="{StaticResource Grey}"
+                           Text="Hold down the power button on the remote until the TV goes off and the Samsung logo comes up (about 5 seconds). A normal off and on doesn't count – the TV only switches Developer Mode on after a full restart."/>
+              </StackPanel>
+
+              <Border Grid.Row="4" Width="24" Height="24" CornerRadius="12" Background="{StaticResource Green}" VerticalAlignment="Top">
+                <TextBlock Text="✓" Foreground="White" FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+              </Border>
+              <StackPanel Grid.Row="4" Grid.Column="1" Margin="0,2,0,0">
+                <TextBlock Text="That's it – now go to C below and click Find my TV" FontWeight="SemiBold"/>
+                <TextBlock TextWrapping="Wrap" Foreground="{StaticResource Grey}"
+                           Text="The TV must be on the same Wi-Fi or router as this PC. If you go back to the Apps screen you'll see Developer Mode written at the top – that means it worked."/>
+              </StackPanel>
+            </Grid>
           </StackPanel>
         </Border>
 

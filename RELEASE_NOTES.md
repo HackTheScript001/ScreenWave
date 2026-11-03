@@ -1,3 +1,6 @@
+What's new in 1.0.1
+- Clearer steps for turning on the TV's Developer Mode: what to press, what you'll see on the TV, and this PC's number shown big to type in.
+
 What's new in 1.0.0
 - First version of ScreenWave: speeds up Samsung Tizen TVs by removing the preloaded apps you don't use, through the TV's Developer Mode.
 - Connect over your home network, or with a cable straight from your PC to the TV – the TV never needs the internet.
