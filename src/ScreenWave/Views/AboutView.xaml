@@ -1,0 +1,44 @@
+<UserControl x:Class="ScreenWave.Views.AboutView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <ScrollViewer VerticalScrollBarVisibility="Auto">
+    <StackPanel Margin="24,18,24,18" MaxWidth="860" HorizontalAlignment="Left">
+      <TextBlock Text="About" Style="{StaticResource PageTitle}"/>
+
+      <Border Style="{StaticResource Card}" Margin="0,16,0,0" Padding="20,16">
+        <StackPanel>
+          <TextBlock FontSize="15" FontWeight="SemiBold">
+            <Run Text="ScreenWave – a "/><Run Text="Second" Foreground="{StaticResource Blue}"/><Run Text="Wave" Foreground="{StaticResource Green}"/><Run Text=" IT Systems product"/>
+          </TextBlock>
+          <TextBlock x:Name="VersionLine" Foreground="{StaticResource Grey}" Margin="0,4,0,0"/>
+          <TextBlock Foreground="{StaticResource Grey}" Margin="0,4,0,0" TextWrapping="Wrap"
+                     Text="Free to use. © SecondWave IT Systems. All rights reserved. Not made by or connected with Samsung."/>
+        </StackPanel>
+      </Border>
+
+      <Border Style="{StaticResource Card}" Margin="0,12,0,0" Padding="20,16">
+        <StackPanel>
+          <TextBlock Text="Your privacy" FontSize="15" FontWeight="SemiBold"/>
+          <TextBlock TextWrapping="Wrap" Margin="0,6,0,0" LineHeight="21">
+            <Run Text="•  ScreenWave never connects to the internet. It only talks to your TV's address on your own network (or the cable)."/><LineBreak/>
+            <Run Text="•  It only connects to private local addresses (192.168.x.x, 10.x.x.x, 172.16–31.x.x)."/><LineBreak/>
+            <Run Text="•  Nothing about you, your TV or your apps is sent to SecondWave IT Systems, GitHub or anyone else. There's no update check and no tracking."/><LineBreak/>
+            <Run Text="•  Its log, list of removed apps and checklist stay on this PC in your user folder."/><LineBreak/>
+            <Run Text="•  When you close it, it stops Samsung's sdb helper so nothing is left running."/>
+          </TextBlock>
+          <StackPanel Orientation="Horizontal" Margin="-8,12,0,0">
+            <Button Content="Open ScreenWave's files" Style="{StaticResource GhostButton}" Click="OnOpenData"/>
+          </StackPanel>
+        </StackPanel>
+      </Border>
+
+      <Border Style="{StaticResource Card}" Margin="0,12,0,0" Padding="20,16">
+        <StackPanel>
+          <TextBlock Text="Third-party software" FontSize="15" FontWeight="SemiBold"/>
+          <TextBlock TextWrapping="Wrap" Margin="0,6,0,0" Foreground="{StaticResource Grey}"
+                     Text="ScreenWave includes sdb (Smart Development Bridge) from the Tizen SDK, unmodified, to talk to the TV's Developer Mode. sdb is © Samsung Electronics and the Android Open Source Project, licensed under the Apache License 2.0 (its licence is in the sdb folder where ScreenWave is installed). Samsung, Tizen and Smart Hub are trademarks of Samsung Electronics."/>
+        </StackPanel>
+      </Border>
+    </StackPanel>
+  </ScrollViewer>
+</UserControl>

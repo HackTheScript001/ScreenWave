@@ -1,0 +1,47 @@
+<UserControl x:Class="ScreenWave.Views.FinishView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             Loaded="OnLoaded">
+  <ScrollViewer VerticalScrollBarVisibility="Auto">
+    <StackPanel Margin="24,18,24,18" MaxWidth="860" HorizontalAlignment="Left">
+      <TextBlock Text="Finish up" Style="{StaticResource PageTitle}"/>
+      <TextBlock Style="{StaticResource PageSub}" Text="Put things back the way they were, apart from the bloat."/>
+
+      <Border Style="{StaticResource Card}" Margin="0,16,0,0" Padding="20,16">
+        <DockPanel>
+          <Button x:Name="DisconnectButton" DockPanel.Dock="Right" Content="Disconnect" Style="{StaticResource GhostButton}" Click="OnDisconnect" VerticalAlignment="Center"/>
+          <StackPanel>
+            <TextBlock Text="1.  Disconnect" FontSize="15" FontWeight="SemiBold"/>
+            <TextBlock Foreground="{StaticResource Grey}" TextWrapping="Wrap" Margin="0,4,0,0"
+                       Text="ScreenWave also disconnects and stops its helper by itself when you close it."/>
+          </StackPanel>
+        </DockPanel>
+      </Border>
+
+      <Border Style="{StaticResource Card}" Margin="0,12,0,0" Padding="20,16">
+        <StackPanel>
+          <TextBlock Text="2.  Turn Developer Mode off on the TV" FontSize="15" FontWeight="SemiBold"/>
+          <TextBlock TextWrapping="Wrap" Margin="0,6,0,0" LineHeight="21"
+                     Text="Leaving it on lets a computer at the Host PC IP install and remove apps. On the TV: Home › Apps, press 1 2 3 4 5, switch Developer Mode Off, then restart the TV (hold the power button until the Samsung logo appears)."/>
+        </StackPanel>
+      </Border>
+
+      <Border Style="{StaticResource Card}" Margin="0,12,0,0" Padding="20,16">
+        <StackPanel>
+          <TextBlock Text="3.  Used a cable? Put this PC back to normal" FontSize="15" FontWeight="SemiBold"/>
+          <TextBlock TextWrapping="Wrap" Margin="0,6,0,0"
+                     Text="On 1. Connect to the TV, open B and click Undo. On the TV, set IP setting back to Obtain automatically if you'll plug it into your router."/>
+        </StackPanel>
+      </Border>
+
+      <Border Style="{StaticResource Card}" Margin="0,12,0,0" Padding="20,16">
+        <StackPanel>
+          <TextBlock Text="Apps removed so far" FontSize="15" FontWeight="SemiBold"/>
+          <TextBlock Foreground="{StaticResource Grey}" TextWrapping="Wrap" Margin="0,4,0,0"
+                     Text="Kept on this PC only, so you know what to reinstall from the TV's Apps store if you ever want something back."/>
+          <TextBlock x:Name="RemovedText" TextWrapping="Wrap" Margin="0,10,0,0" FontFamily="Consolas" FontSize="12.5"/>
+        </StackPanel>
+      </Border>
+    </StackPanel>
+  </ScrollViewer>
+</UserControl>

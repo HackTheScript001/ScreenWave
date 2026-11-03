@@ -1,0 +1,41 @@
+<UserControl x:Class="ScreenWave.Views.BlockListView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <ScrollViewer VerticalScrollBarVisibility="Auto">
+    <StackPanel Margin="24,18,24,18" MaxWidth="860" HorizontalAlignment="Left">
+      <TextBlock Text="Stop apps coming back" Style="{StaticResource PageTitle}"/>
+      <TextBlock Style="{StaticResource PageSub}"
+                 Text="Samsung can quietly reinstall preloaded apps after an update. Blocking these addresses on your network stops that. This happens on your own router or AdGuard Home / Pi-hole – ScreenWave doesn't change anything on your network."/>
+
+      <Border Style="{StaticResource Card}" Margin="0,16,0,0" Padding="20,16">
+        <StackPanel>
+          <TextBlock Text="Addresses to block" FontSize="15" FontWeight="SemiBold"/>
+          <TextBox x:Name="DomainBox" IsReadOnly="True" FontFamily="Consolas" FontSize="13" Margin="0,10,0,0"
+                   TextWrapping="NoWrap" AcceptsReturn="True" Background="White" BorderBrush="{StaticResource Line}" Padding="8"/>
+          <StackPanel Orientation="Horizontal" Margin="-8,12,0,0">
+            <Button Content="Copy for AdGuard Home" Style="{StaticResource PrimaryButton}" Click="OnCopyAdGuard"/>
+            <Button Content="Copy for Pi-hole / hosts file" Style="{StaticResource GhostButton}" Click="OnCopyHosts"/>
+            <Button Content="Copy plain list" Style="{StaticResource GhostButton}" Click="OnCopyPlain"/>
+          </StackPanel>
+          <TextBlock x:Name="CopiedText" Foreground="{StaticResource Green}" Margin="0,8,0,0"/>
+        </StackPanel>
+      </Border>
+
+      <Border Style="{StaticResource Card}" Margin="0,12,0,0" Padding="20,16">
+        <StackPanel>
+          <TextBlock Text="Where to paste them" FontSize="15" FontWeight="SemiBold"/>
+          <TextBlock TextWrapping="Wrap" Margin="0,8,0,0" LineHeight="21">
+            <Run Text="AdGuard Home: " FontWeight="SemiBold"/><Run Text="Filters › Custom filtering rules › paste › Apply."/><LineBreak/>
+            <Run Text="Pi-hole: " FontWeight="SemiBold"/><Run Text="Domains › add each address as an exact denylist entry (or paste the hosts list into a local list)."/><LineBreak/>
+            <Run Text="Router: " FontWeight="SemiBold"/><Run Text="many routers have a 'block websites' or parental controls page – add each address there."/>
+          </TextBlock>
+        </StackPanel>
+      </Border>
+
+      <Border Style="{StaticResource Card}" Background="#FFF7E6" Margin="0,12,0,0" Padding="20,16">
+        <TextBlock TextWrapping="Wrap"
+                   Text="While these are blocked, the TV's app store can't download or update apps either. To install or update an app later, take the block off for a few minutes, then put it back."/>
+      </Border>
+    </StackPanel>
+  </ScrollViewer>
+</UserControl>

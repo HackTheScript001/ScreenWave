@@ -1,0 +1,128 @@
+name: Build and release
+
+# Every push to main builds ScreenWave. The first build of a new version becomes the release
+# (installer + .sha256), with notes from RELEASE_NOTES.md.
+#
+# To release an update: bump <Version> in src/ScreenWave/ScreenWave.csproj, add a
+# "What's new in x.y.z" section to the top of RELEASE_NOTES.md, push.
+#
+# Samsung's sdb tool is fetched here, at build time, from the official Tizen Studio package
+# server and checked against the checksum Samsung publishes. The finished app never goes online.
+on:
+  push:
+    branches: [main]
+    paths-ignore:
+      - 'README.md'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Read version
+        id: ver
+        shell: pwsh
+        run: |
+          $v = (Select-Xml -Path src/ScreenWave/ScreenWave.csproj -XPath '//Version').Node.InnerText.Trim()
+          if ($v -notmatch '^\d+\.\d+\.\d+$') { throw "Version '$v' in ScreenWave.csproj must look like 1.2.3" }
+          "version=$v" >> $env:GITHUB_OUTPUT
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+
+      - name: Publish app (self-contained single exe)
+        run: >
+          dotnet publish src/ScreenWave/ScreenWave.csproj
+          -c Release -r win-x64 --self-contained true
+          -p:PublishSingleFile=true
+          -o publish
+
+      - name: Get Samsung sdb (official Tizen Studio package, checksum checked)
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $base = 'https://download.tizen.org/sdk/tizenstudio/official'
+          $list = (Invoke-WebRequest "$base/pkg_list_windows-64" -UseBasicParsing).Content
+
+          # The list is blocks of "Key : Value" lines separated by blank lines
+          $pkg = $null
+          foreach ($block in ($list -split "(\r?\n){2,}")) {
+            $fields = @{}
+            foreach ($line in ($block -split "\r?\n")) {
+              if ($line -match '^\s*([^:]+?)\s*:\s*(.*)$') { $fields[$matches[1].Trim()] = $matches[2].Trim() }
+            }
+            if ($fields['Package'] -eq 'sdb') { $pkg = $fields; break }
+          }
+          if (-not $pkg) { throw "No 'sdb' package in $base/pkg_list_windows-64" }
+          Write-Host "sdb $($pkg['Version']) -> $($pkg['Path'])"
+
+          $zip = Join-Path $env:RUNNER_TEMP 'sdb.zip'
+          Invoke-WebRequest ($base + $pkg['Path']) -OutFile $zip -UseBasicParsing
+
+          $expected = $pkg['SHA256']
+          if (-not $expected) { $pkg.GetEnumerator() | ForEach-Object { Write-Host "$($_.Key): $($_.Value)" }; throw "The package list has no SHA256 for sdb" }
+          $actual = (Get-FileHash $zip -Algorithm SHA256).Hash
+          if ($actual -ne $expected.ToUpper()) { throw "sdb checksum mismatch: expected $expected, got $actual" }
+          Write-Host "Checksum OK: $actual"
+
+          $x = Join-Path $env:RUNNER_TEMP 'sdb-x'
+          Expand-Archive $zip -DestinationPath $x -Force
+          $exe = Get-ChildItem $x -Recurse -Filter sdb.exe | Select-Object -First 1
+          if (-not $exe) { throw "sdb.exe not found in the package" }
+
+          New-Item -ItemType Directory -Force publish\sdb | Out-Null
+          Copy-Item (Join-Path $exe.DirectoryName '*') publish\sdb -Recurse -Force
+          # Keep Samsung's licence files with it
+          Get-ChildItem $x -Recurse -Include *license*,*LICENSE*,*notice*,*NOTICE* -File |
+            ForEach-Object { Copy-Item $_.FullName publish\sdb -Force }
+          "sdb (Smart Development Bridge) $($pkg['Version']) from the Tizen SDK, unmodified." +
+            "`r`n(c) Samsung Electronics and the Android Open Source Project." +
+            "`r`nLicensed under the Apache License, Version 2.0: https://www.apache.org/licenses/LICENSE-2.0" |
+            Set-Content publish\sdb\THIRD-PARTY-NOTICE.txt -Encoding ascii
+          Get-ChildItem publish\sdb | Format-Table Name, Length
+
+      - name: Install Inno Setup
+        run: choco install innosetup -y --no-progress
+
+      - name: Build installer
+        shell: pwsh
+        run: |
+          & "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe" /DMyAppVersion=${{ steps.ver.outputs.version }} installer\ScreenWave.iss
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+      - name: Checksum
+        shell: pwsh
+        run: |
+          $exe = Get-Item "output\ScreenWave-${{ steps.ver.outputs.version }}-Setup.exe"
+          "$((Get-FileHash $exe.FullName -Algorithm SHA256).Hash.ToLower())  $($exe.Name)" |
+            Set-Content -NoNewline -Encoding ascii "$($exe.FullName).sha256"
+
+      - name: Keep the build
+        uses: actions/upload-artifact@v4
+        with:
+          name: ScreenWave-${{ steps.ver.outputs.version }}
+          path: output/*
+
+      - name: Publish release (first build of a new version only)
+        if: github.ref == 'refs/heads/main'
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          v="${{ steps.ver.outputs.version }}"
+          if gh release view "v$v" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            echo "Release v$v already exists - nothing to publish."; exit 0
+          fi
+          gh release create "v$v" "output/ScreenWave-$v-Setup.exe" "output/ScreenWave-$v-Setup.exe.sha256" \
+            --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" --title "ScreenWave $v" --notes-file RELEASE_NOTES.md

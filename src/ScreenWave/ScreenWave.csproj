@@ -1,0 +1,38 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <UseWPF>true</UseWPF>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <LangVersion>latest</LangVersion>
+
+    <AssemblyName>ScreenWave</AssemblyName>
+    <RootNamespace>ScreenWave</RootNamespace>
+    <Product>ScreenWave</Product>
+    <Company>SecondWave IT Systems</Company>
+    <Authors>Liam Mayes</Authors>
+    <Description>Removes bloat from Samsung Tizen TVs over your local network.</Description>
+    <Copyright>© SecondWave IT Systems. ScreenWave is a SecondWave IT Systems product.</Copyright>
+
+    <!-- To release an update: bump this, add a "What's new in x.y.z" section to RELEASE_NOTES.md, push -->
+    <Version>1.0.0</Version>
+
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <ApplicationIcon>Assets\ScreenWave.ico</ApplicationIcon>
+
+    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+    <SelfContained>true</SelfContained>
+    <PublishSingleFile>true</PublishSingleFile>
+    <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
+    <EnableCompressionInSingleFile>true</EnableCompressionInSingleFile>
+    <DebugType>embedded</DebugType>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Resource Include="Assets\ScreenWave.ico" />
+    <Resource Include="Assets\ScreenWaveLogo.png" />
+  </ItemGroup>
+
+</Project>

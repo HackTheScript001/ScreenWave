@@ -1,0 +1,75 @@
+<Window x:Class="ScreenWave.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="ScreenWave" Width="1120" Height="740" MinWidth="920" MinHeight="560"
+        WindowStartupLocation="CenterScreen" Background="White"
+        Icon="Assets/ScreenWave.ico" FontFamily="Segoe UI" FontSize="13"
+        Loaded="OnLoaded" Closing="OnClosing">
+
+  <Grid>
+    <Grid.RowDefinitions>
+      <RowDefinition Height="Auto"/>
+      <RowDefinition Height="*"/>
+      <RowDefinition Height="Auto"/>
+    </Grid.RowDefinitions>
+
+    <!-- Header -->
+    <Border Grid.Row="0" BorderBrush="{StaticResource Line}" BorderThickness="0,0,0,1" Padding="24,14">
+      <DockPanel>
+        <Image Source="Assets/ScreenWaveLogo.png" Width="48" Height="48" Margin="0,0,14,0" DockPanel.Dock="Left"
+               RenderOptions.BitmapScalingMode="HighQuality"/>
+        <StackPanel DockPanel.Dock="Left" VerticalAlignment="Center">
+          <TextBlock FontSize="22" FontWeight="Bold" LineHeight="26">
+            <Run Text="Screen" Foreground="{StaticResource Blue}"/><Run Text="Wave" Foreground="{StaticResource Green}"/>
+          </TextBlock>
+          <TextBlock Text="Speeds up Samsung TVs by removing the apps you don't use" Foreground="{StaticResource Grey}"/>
+        </StackPanel>
+
+        <StackPanel DockPanel.Dock="Right" VerticalAlignment="Center" HorizontalAlignment="Right">
+          <TextBlock HorizontalAlignment="Right" Foreground="{StaticResource Grey}">
+            <Run Text="A "/><Run Text="Second" Foreground="{StaticResource Blue}" FontWeight="SemiBold"/><Run Text="Wave" Foreground="{StaticResource Green}" FontWeight="SemiBold"/><Run Text=" IT Systems product"/>
+          </TextBlock>
+          <TextBlock x:Name="VersionText" HorizontalAlignment="Right" Foreground="{StaticResource Grey}" FontSize="11.5"/>
+        </StackPanel>
+      </DockPanel>
+    </Border>
+
+    <Grid Grid.Row="1">
+      <Grid.ColumnDefinitions>
+        <ColumnDefinition Width="210"/>
+        <ColumnDefinition Width="*"/>
+      </Grid.ColumnDefinitions>
+
+      <!-- Sidebar -->
+      <Border Grid.Column="0" Background="{StaticResource Panel}" BorderBrush="{StaticResource Line}" BorderThickness="0,0,1,0" Padding="12,16">
+        <DockPanel>
+          <Border DockPanel.Dock="Bottom" Background="White" CornerRadius="8" Padding="12,10" BorderBrush="{StaticResource Line}" BorderThickness="1">
+            <StackPanel>
+              <TextBlock FontWeight="SemiBold">
+                <Run x:Name="ConnDot" Text="●" Foreground="#9CA3AF"/><Run x:Name="ConnText" Text=" No TV connected"/>
+              </TextBlock>
+              <TextBlock x:Name="ConnDetail" Foreground="{StaticResource Grey}" FontSize="11.5" TextWrapping="Wrap" Margin="0,2,0,0"/>
+              <TextBlock Text="Local network only – nothing leaves this PC." Foreground="{StaticResource Grey}" FontSize="11" TextWrapping="Wrap" Margin="0,6,0,0"/>
+            </StackPanel>
+          </Border>
+          <StackPanel>
+            <RadioButton Style="{StaticResource NavItem}" GroupName="nav" Tag="connect" Content="1. Connect to the TV" Checked="OnNav" IsChecked="True"/>
+            <RadioButton Style="{StaticResource NavItem}" GroupName="nav" Tag="apps" Content="2. Remove apps" Checked="OnNav"/>
+            <RadioButton Style="{StaticResource NavItem}" GroupName="nav" Tag="tips" Content="3. Speed-up settings" Checked="OnNav"/>
+            <RadioButton Style="{StaticResource NavItem}" GroupName="nav" Tag="block" Content="4. Stop apps coming back" Checked="OnNav"/>
+            <RadioButton Style="{StaticResource NavItem}" GroupName="nav" Tag="finish" Content="5. Finish up" Checked="OnNav"/>
+            <RadioButton Style="{StaticResource NavItem}" GroupName="nav" Tag="about" Content="About" Checked="OnNav" Margin="0,18,0,2"/>
+          </StackPanel>
+        </DockPanel>
+      </Border>
+
+      <ContentControl x:Name="PageHost" Grid.Column="1"/>
+    </Grid>
+
+    <Expander Grid.Row="2" Header="Details" Margin="16,2,16,4" Foreground="{StaticResource Grey}">
+      <TextBox x:Name="LogBox" Height="130" IsReadOnly="True" FontFamily="Consolas" FontSize="11.5"
+               VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto" TextWrapping="NoWrap"
+               Background="{StaticResource Panel}" BorderBrush="{StaticResource Line}"/>
+    </Expander>
+  </Grid>
+</Window>
