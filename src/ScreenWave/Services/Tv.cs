@@ -16,6 +16,7 @@ public static class Tv
     public static string? Serial { get; private set; }          // e.g. "192.168.1.50:26101"
     public static string Details { get; private set; } = "";
     public static string Model { get; private set; } = "";          // e.g. "UE50AU8000KXXU"
+    public static string PlatformVersion { get; private set; } = "";  // Tizen version, e.g. "6.0" (2021 TVs)
     public static string Ip => Serial?.Split(':')[0] ?? "";
     public static bool Connected => Serial != null;
 
@@ -140,6 +141,8 @@ public static class Tv
         Details = Summarise(cap.Output, line);
         var model = line.Split((char[]?)null, StringSplitOptions.RemoveEmptyEntries).LastOrDefault() ?? "";
         Model = model is "device" ? "" : model;
+        PlatformVersion = cap.Output.Split('\n').Select(l => l.Split(':', 2)).Where(p => p.Length == 2 && p[0].Trim() == "platform_version")
+            .Select(p => p[1].Trim()).FirstOrDefault() ?? "";
         Serial = serial;
         Log.Write($"Connected to the TV at {ip}");
         ConnectionChanged?.Invoke();
@@ -154,6 +157,7 @@ public static class Tv
         Serial = null;
         Details = "";
         Model = "";
+        PlatformVersion = "";
         ConnectionChanged?.Invoke();
     }
 

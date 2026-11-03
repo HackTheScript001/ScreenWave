@@ -1,3 +1,7 @@
+What's new in 1.2.0
+- Do it for me now uses button presses built into ScreenWave for your TV's year, so there's nothing to set up – click it and the remote does it. (Recordings for 2021 TVs are coming in the next update.)
+- Teach is now behind a Teach mode switch, for recording new TV years.
+
 What's new in 1.1.1
 - Remove apps: uses the app ID the TV's remove command expects (2021 TVs answered "can not uninstall app" before), and tries the other ID forms if one is refused.
 - The firewall lock status now shows at the bottom of the window as well as on About.

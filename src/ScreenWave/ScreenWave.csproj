@@ -17,7 +17,7 @@
     <Copyright>© SecondWave IT Systems. ScreenWave is a SecondWave IT Systems product.</Copyright>
 
     <!-- To release an update: bump this, add a "What's new in x.y.z" section to RELEASE_NOTES.md, push -->
-    <Version>1.1.1</Version>
+    <Version>1.2.0</Version>
 
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <ApplicationIcon>Assets\ScreenWave.ico</ApplicationIcon>
@@ -37,6 +37,8 @@
   <ItemGroup>
     <Resource Include="Assets\ScreenWave.ico" />
     <Resource Include="Assets\ScreenWaveLogo.png" />
+    <!-- "Do it for me" button presses built into ScreenWave, by TV year (Tizen version) -->
+    <EmbeddedResource Include="Assets\routines-builtin.json" />
   </ItemGroup>
 
 </Project>

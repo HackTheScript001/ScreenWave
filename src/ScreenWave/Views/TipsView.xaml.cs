@@ -9,7 +9,7 @@ namespace ScreenWave.Views;
 
 public sealed class TipRow : ObservableItem
 {
-    private bool _hasRoutine, _teaching, _canUse, _remote;
+    private bool _hasRoutine, _teaching, _canUse, _remote, _teachMode;
 
     public required Tip Tip { get; init; }
 
@@ -20,9 +20,10 @@ public sealed class TipRow : ObservableItem
     public bool Teaching { get => _teaching; set { Set(ref _teaching, value); Refresh(); } }
     public bool CanUse { get => _canUse; set => Set(ref _canUse, value); }
     public bool RemoteOn { get => _remote; set { Set(ref _remote, value); Refresh(); } }
+    public bool TeachMode { get => _teachMode; set { Set(ref _teachMode, value); Refresh(); } }
 
     public Visibility DoItVisibility => Automatable && RemoteOn && HasRoutine && !Teaching ? Visibility.Visible : Visibility.Collapsed;
-    public Visibility TeachVisibility => Automatable && RemoteOn && !Teaching ? Visibility.Visible : Visibility.Collapsed;
+    public Visibility TeachVisibility => Automatable && RemoteOn && TeachMode && !Teaching ? Visibility.Visible : Visibility.Collapsed;
     public Visibility SaveVisibility => Teaching ? Visibility.Visible : Visibility.Collapsed;
     public string TeachLabel => HasRoutine ? "Teach again" : "Teach";
 
@@ -85,18 +86,22 @@ public partial class TipsView : UserControl
     {
         var on = TvRemote.Connected;
         RemoteDot.Foreground = on ? (Brush)FindResource("Green") : new SolidColorBrush(Color.FromRgb(0x9C, 0xA3, 0xAF));
-        RemoteTitle.Text = on ? $" Remote connected – {Routines.Range(Tv.Model)}" : " Remote not connected";
+        RemoteTitle.Text = on ? $" Remote connected – {Routines.Range(Tv.Model)} (Tizen {Tv.PlatformVersion})" : " Remote not connected";
         RemoteButton.Content = on ? "Disconnect remote" : "Connect remote";
         RemoteButton.IsEnabled = !_connecting && _playing == null && (on || Tv.Connected);
         if (!on && !Tv.Connected) RemoteHelp.Text = "Connect to the TV on page 1 first.";
         else if (!on) RemoteHelp.Text = "Lets ScreenWave press the TV's remote buttons over your network. The first time, the TV asks whether to allow ScreenWave – choose Allow with your remote.";
-        else RemoteHelp.Text = "Teach a setting once by doing it with the buttons on the right, then Do it for me repeats it on any TV in this range.";
+        else if (_rows.Any(r => r.Automatable && Routines.Get(Tv.Model, Tv.PlatformVersion, r.Tip.Key) != null))
+            RemoteHelp.Text = "Click Do it for me on a setting and watch the TV – ScreenWave presses the buttons. You can also use the buttons on the right yourself.";
+        else
+            RemoteHelp.Text = "Do it for me isn't ready for this TV yet – do the settings with your remote, or with the buttons on the right.";
         Pad.IsEnabled = on && _playing == null;
 
         foreach (var r in _rows)
         {
             r.RemoteOn = on;
-            r.HasRoutine = Routines.Get(Tv.Model, r.Tip.Key) != null;
+            r.HasRoutine = Routines.Get(Tv.Model, Tv.PlatformVersion, r.Tip.Key) != null;
+            r.TeachMode = TeachModeBox.IsChecked == true;
             r.CanUse = on && _playing == null && _teaching == null;
         }
     }
@@ -183,8 +188,8 @@ public partial class TipsView : UserControl
             TeachText.Text = "Nothing recorded yet – use the buttons on the right first.";
             return;
         }
-        Routines.Set(Tv.Model, _teaching.Tip.Key, [.. _recorded]);
-        _teaching.Status = $"Recorded for {Routines.Range(Tv.Model)} TVs ({_recorded.Count} presses).";
+        Routines.Set(Tv.Model, Tv.PlatformVersion, _teaching.Tip.Key, [.. _recorded]);
+        _teaching.Status = $"Recorded for {Routines.Range(Tv.Model)} / Tizen {Tv.PlatformVersion} TVs ({_recorded.Count} presses).";
         _teaching.Selected = true;
         CancelTeaching();
     }
@@ -205,7 +210,7 @@ public partial class TipsView : UserControl
     private async void OnDoIt(object sender, RoutedEventArgs e)
     {
         if (sender is not FrameworkElement { DataContext: TipRow row } || !TvRemote.Connected) return;
-        var keys = Routines.Get(Tv.Model, row.Tip.Key);
+        var keys = Routines.Get(Tv.Model, Tv.PlatformVersion, row.Tip.Key);
         if (keys == null) return;
 
         _playing = new CancellationTokenSource();
@@ -218,7 +223,7 @@ public partial class TipsView : UserControl
             await Routines.PlayAsync(keys, (i, key) => Dispatcher.Invoke(() =>
                 TeachText.Text = $"Watch the TV – pressing {TvRemote.Label(key)} ({i + 1} of {keys.Count}). Click Stop if it goes wrong."),
                 _playing.Token);
-            row.Status = "Done by ScreenWave – check it on the TV.";
+            row.Status = "Done – check the TV. These are switches: if it was already off it's now On, so click Do it for me again to switch it back.";
             row.Selected = true;
         }
         catch (OperationCanceledException)
@@ -241,6 +246,13 @@ public partial class TipsView : UserControl
     }
 
     private void OnStop(object sender, RoutedEventArgs e) => _playing?.Cancel();
+
+    private void OnTeachMode(object sender, RoutedEventArgs e)
+    {
+        if (TeachModeBox.IsChecked != true) CancelTeaching();
+        ExportButton.Visibility = ImportButton.Visibility = TeachModeBox.IsChecked == true ? Visibility.Visible : Visibility.Collapsed;
+        UpdateRemote();
+    }
 
     // ───────────── Sharing recordings between PCs (as a file – never online) ─────────────
 
