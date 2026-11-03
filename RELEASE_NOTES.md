@@ -1,3 +1,7 @@
+What's new in 1.1.1
+- Remove apps: uses the app ID the TV's remove command expects (2021 TVs answered "can not uninstall app" before), and tries the other ID forms if one is refused.
+- The firewall lock status now shows at the bottom of the window as well as on About.
+
 What's new in 1.1.0
 - Remove apps now reads the app list from 2021 and newer TVs, and shows how often each app has been opened. Apps that have never been opened are suggested for removal.
 - Do it for me: connect ScreenWave as a remote (the TV asks you to Allow it once), teach a setting once with the on-screen remote, and ScreenWave repeats it for you on any TV in the same model range. Recordings stay on your PC and can be exported to a file.

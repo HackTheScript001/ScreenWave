@@ -49,7 +49,8 @@
                 <Run x:Name="ConnDot" Text="●" Foreground="#9CA3AF"/><Run x:Name="ConnText" Text=" No TV connected"/>
               </TextBlock>
               <TextBlock x:Name="ConnDetail" Foreground="{StaticResource Grey}" FontSize="11.5" TextWrapping="Wrap" Margin="0,2,0,0"/>
-              <TextBlock Text="Local network only – nothing leaves this PC." Foreground="{StaticResource Grey}" FontSize="11" TextWrapping="Wrap" Margin="0,6,0,0"/>
+              <TextBlock x:Name="FirewallText" Text="Checking firewall lock…" Foreground="{StaticResource Grey}" FontSize="11.5" FontWeight="SemiBold" TextWrapping="Wrap" Margin="0,8,0,0"/>
+              <TextBlock Text="Local network only – nothing leaves this PC." Foreground="{StaticResource Grey}" FontSize="11" TextWrapping="Wrap" Margin="0,2,0,0"/>
             </StackPanel>
           </Border>
           <StackPanel>

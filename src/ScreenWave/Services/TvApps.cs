@@ -106,12 +106,49 @@ public static class TvApps
         return !Regex.IsMatch(id, @"^\d{8,}(\.\w+)?$");
     }
 
-    /// <summary>Removes one app. Returns the TV's answer; success is confirmed by listing apps again afterwards.</summary>
+    /// <summary>
+    /// Removes one app. TVs differ in which ID they accept, so this tries the Tizen app ID first
+    /// (e.g. GR7TWEBh5d.BBCSounds), then its package ID (GR7TWEBh5d), then the store number.
+    /// Success is confirmed afterwards by listing apps again.
+    /// </summary>
     public static async Task<SdbResult> RemoveAsync(string serial, TvApp app)
     {
         if (app.Kind == AppKind.Core) throw new InvalidOperationException($"{app.Title} is part of Samsung's system and isn't removed.");
-        return await Sdb.OnTvAsync(serial, "shell", "0", "vd_appuninstall", app.Id);
+
+        var ids = new List<string>();
+        void Add(string? id) { if (!string.IsNullOrWhiteSpace(id) && !ids.Contains(id)) ids.Add(id); }
+        string? Field(string k) => app.Fields.TryGetValue(k, out var v) ? v : null;
+
+        var tizenId = Field("app_tizen_id");
+        Add(tizenId);
+        Add(Field("app_package_name"));
+        if (tizenId?.Contains('.') == true) Add(tizenId[..tizenId.IndexOf('.')]);
+        Add(app.Id);
+
+        SdbResult last = new(-1, "no ID to remove by", false);
+        foreach (var id in ids)
+        {
+            last = await Sdb.OnTvAsync(serial, "shell", "0", "vd_appuninstall", id);
+            if (!Refused(last)) return last;
+        }
+
+        // Last resort: the standard Tizen uninstall by package
+        var pkg = tizenId?.Contains('.') == true ? tizenId[..tizenId.IndexOf('.')] : Field("app_package_name");
+        if (!string.IsNullOrEmpty(pkg))
+        {
+            var r = await Sdb.OnTvAsync(serial, "uninstall", pkg);
+            if (!Refused(r)) return r;
+        }
+        return last;
     }
+
+    private static bool Refused(SdbResult r) =>
+        r.TimedOut ||
+        r.Output.Contains("can not", StringComparison.OrdinalIgnoreCase) ||
+        r.Output.Contains("cannot", StringComparison.OrdinalIgnoreCase) ||
+        r.Output.Contains("fail", StringComparison.OrdinalIgnoreCase) ||
+        r.Output.Contains("error", StringComparison.OrdinalIgnoreCase) ||
+        r.Output.Trim().Equals("closed", StringComparison.OrdinalIgnoreCase);
 
     // ───────────── Local record of what was removed (on this PC only) ─────────────
 

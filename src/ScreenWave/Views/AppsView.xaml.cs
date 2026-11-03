@@ -161,7 +161,7 @@ public partial class AppsView : UserControl
 
             var refused = chosen.Count - removed.Count;
             StatusText.Text = $"Removed {removed.Count} app(s)" +
-                              (refused > 0 ? $". The TV refused {refused} – its firmware protects them." : ".") +
+                              (refused > 0 ? $". The TV wouldn't remove {refused} – open Details to see what it said." : ".") +
                               " Next: 3. Speed-up settings.";
         }
         catch (Exception ex)

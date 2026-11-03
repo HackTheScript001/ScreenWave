@@ -23,10 +23,16 @@ public partial class MainWindow : Window
         Tv.ConnectionChanged += () => Dispatcher.InvokeAsync(UpdateConnection);
     }
 
-    private void OnLoaded(object sender, RoutedEventArgs e)
+    private async void OnLoaded(object sender, RoutedEventArgs e)
     {
         ShowPage("connect");
         UpdateConnection();
+        var locked = await FirewallLock.IsOnAsync();
+        FirewallText.Text = locked ? "✓ Firewall lock is on" : "Firewall lock is off – reinstall to add it";
+        FirewallText.Foreground = (Brush)FindResource(locked ? "Good" : "Warn");
+        FirewallText.ToolTip = locked
+            ? "Windows Firewall blocks ScreenWave and sdb from every internet address."
+            : "The installer adds Windows Firewall rules that keep ScreenWave off the internet.";
         if (!Sdb.IsAvailable)
             Log.Write($"Warning: sdb.exe is missing from {Sdb.ExePath}. Reinstall ScreenWave.");
     }
