@@ -17,7 +17,7 @@
     <Copyright>© SecondWave IT Systems. ScreenWave is a SecondWave IT Systems product.</Copyright>
 
     <!-- To release an update: bump this, add a "What's new in x.y.z" section to RELEASE_NOTES.md, push -->
-    <Version>1.0.1</Version>
+    <Version>1.1.0</Version>
 
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <ApplicationIcon>Assets\ScreenWave.ico</ApplicationIcon>
@@ -29,6 +29,10 @@
     <EnableCompressionInSingleFile>true</EnableCompressionInSingleFile>
     <DebugType>embedded</DebugType>
   </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="System.Security.Cryptography.ProtectedData" Version="8.0.0" />
+  </ItemGroup>
 
   <ItemGroup>
     <Resource Include="Assets\ScreenWave.ico" />

@@ -1,8 +1,19 @@
 <UserControl x:Class="ScreenWave.Views.TipsView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             Loaded="OnLoaded">
+  <UserControl.Resources>
+    <Style x:Key="PadButton" TargetType="Button" BasedOn="{StaticResource GhostButton}">
+      <Setter Property="Margin" Value="3"/>
+      <Setter Property="Padding" Value="0"/>
+      <Setter Property="Width" Value="64"/>
+      <Setter Property="Height" Value="34"/>
+    </Style>
+  </UserControl.Resources>
+
   <Grid>
     <Grid.RowDefinitions>
+      <RowDefinition Height="Auto"/>
       <RowDefinition Height="Auto"/>
       <RowDefinition Height="*"/>
       <RowDefinition Height="Auto"/>
@@ -11,10 +22,47 @@
     <StackPanel Grid.Row="0" Margin="24,18,24,8">
       <TextBlock Text="Speed-up settings" Style="{StaticResource PageTitle}"/>
       <TextBlock Style="{StaticResource PageSub}"
-                 Text="Samsung's own background services can't be removed, but these settings switch most of them off. Do each one on the TV with the remote and tick it here. Menu names vary a little by year."/>
+                 Text="Samsung's own background services can't be removed, but these settings switch most of them off. Do them with your remote, or let ScreenWave press the buttons for you."/>
     </StackPanel>
 
-    <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" Padding="24,4">
+    <!-- Remote control -->
+    <Border Grid.Row="1" Style="{StaticResource Card}" Margin="24,0,24,10" Padding="16,12">
+      <DockPanel>
+        <!-- On-screen remote -->
+        <Grid DockPanel.Dock="Right" x:Name="Pad" IsEnabled="False">
+          <Grid.ColumnDefinitions>
+            <ColumnDefinition/><ColumnDefinition/><ColumnDefinition/><ColumnDefinition Width="12"/><ColumnDefinition/><ColumnDefinition/>
+          </Grid.ColumnDefinitions>
+          <Grid.RowDefinitions>
+            <RowDefinition/><RowDefinition/><RowDefinition/>
+          </Grid.RowDefinitions>
+          <Button Grid.Row="0" Grid.Column="1" Content="▲" Tag="KEY_UP" Style="{StaticResource PadButton}" Click="OnPad"/>
+          <Button Grid.Row="1" Grid.Column="0" Content="◀" Tag="KEY_LEFT" Style="{StaticResource PadButton}" Click="OnPad"/>
+          <Button Grid.Row="1" Grid.Column="1" Content="OK" Tag="KEY_ENTER" Style="{StaticResource PadButton}" Click="OnPad" FontWeight="Bold"/>
+          <Button Grid.Row="1" Grid.Column="2" Content="▶" Tag="KEY_RIGHT" Style="{StaticResource PadButton}" Click="OnPad"/>
+          <Button Grid.Row="2" Grid.Column="1" Content="▼" Tag="KEY_DOWN" Style="{StaticResource PadButton}" Click="OnPad"/>
+          <Button Grid.Row="0" Grid.Column="4" Content="Home" Tag="KEY_HOME" Style="{StaticResource PadButton}" Click="OnPad"/>
+          <Button Grid.Row="0" Grid.Column="5" Content="Settings" Tag="KEY_MENU" Style="{StaticResource PadButton}" Click="OnPad"/>
+          <Button Grid.Row="1" Grid.Column="4" Content="Back" Tag="KEY_RETURN" Style="{StaticResource PadButton}" Click="OnPad"/>
+          <Button Grid.Row="1" Grid.Column="5" Content="Exit" Tag="KEY_EXIT" Style="{StaticResource PadButton}" Click="OnPad"/>
+        </Grid>
+
+        <StackPanel Margin="0,0,16,0" VerticalAlignment="Center">
+          <TextBlock FontWeight="SemiBold" FontSize="14">
+            <Run x:Name="RemoteDot" Text="●" Foreground="#9CA3AF"/><Run x:Name="RemoteTitle" Text=" Remote not connected"/>
+          </TextBlock>
+          <TextBlock x:Name="RemoteHelp" TextWrapping="Wrap" Foreground="{StaticResource Grey}" Margin="0,4,0,0"
+                     Text="Lets ScreenWave press the TV's remote buttons over your network. The first time, the TV asks whether to allow ScreenWave – choose Allow with your remote."/>
+          <StackPanel Orientation="Horizontal" Margin="-8,10,0,0">
+            <Button x:Name="RemoteButton" Content="Connect remote" Style="{StaticResource PrimaryButton}" Click="OnRemoteConnect"/>
+            <Button x:Name="StopButton" Content="Stop" Style="{StaticResource DangerButton}" Click="OnStop" Visibility="Collapsed"/>
+          </StackPanel>
+          <TextBlock x:Name="TeachText" TextWrapping="Wrap" Foreground="{StaticResource Blue}" Margin="0,10,0,0" Visibility="Collapsed"/>
+        </StackPanel>
+      </DockPanel>
+    </Border>
+
+    <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Auto" Padding="24,0">
       <ItemsControl x:Name="TipList">
         <ItemsControl.ItemTemplate>
           <DataTemplate>
@@ -22,10 +70,17 @@
               <DockPanel>
                 <CheckBox DockPanel.Dock="Left" VerticalAlignment="Top" Margin="0,3,12,0"
                           IsChecked="{Binding Selected, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
+                <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" VerticalAlignment="Center" Margin="12,0,0,0">
+                  <Button Content="Do it for me" Style="{StaticResource PrimaryButton}" Click="OnDoIt" Visibility="{Binding DoItVisibility}" IsEnabled="{Binding CanUse}"/>
+                  <Button Content="{Binding TeachLabel}" Style="{StaticResource GhostButton}" Click="OnTeach" Visibility="{Binding TeachVisibility}" IsEnabled="{Binding CanUse}"/>
+                  <Button Content="Save" Style="{StaticResource GreenButton}" Click="OnSaveTeach" Visibility="{Binding SaveVisibility}"/>
+                  <Button Content="Cancel" Style="{StaticResource GhostButton}" Click="OnCancelTeach" Visibility="{Binding SaveVisibility}"/>
+                </StackPanel>
                 <StackPanel>
                   <TextBlock Text="{Binding Tip.Title}" FontWeight="SemiBold" FontSize="14"/>
                   <TextBlock Text="{Binding Tip.Why}" Foreground="{StaticResource Grey}" TextWrapping="Wrap" Margin="0,2,0,0"/>
                   <TextBlock Text="{Binding Tip.Where}" Foreground="{StaticResource Blue}" TextWrapping="Wrap" Margin="0,4,0,0"/>
+                  <TextBlock Text="{Binding Status}" Foreground="{StaticResource Green}" TextWrapping="Wrap" Margin="0,4,0,0"/>
                 </StackPanel>
               </DockPanel>
             </Border>
@@ -34,10 +89,14 @@
       </ItemsControl>
     </ScrollViewer>
 
-    <Border Grid.Row="2" BorderBrush="{StaticResource Line}" BorderThickness="0,1,0,0" Padding="24,12">
+    <Border Grid.Row="3" BorderBrush="{StaticResource Line}" BorderThickness="0,1,0,0" Padding="24,12">
       <DockPanel>
-        <Button DockPanel.Dock="Right" Content="Clear ticks" Style="{StaticResource GhostButton}" Click="OnClear"/>
-        <TextBlock x:Name="ProgressText" VerticalAlignment="Center"/>
+        <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
+          <Button Content="Import recordings" Style="{StaticResource GhostButton}" Click="OnImport"/>
+          <Button Content="Export recordings" Style="{StaticResource GhostButton}" Click="OnExport"/>
+          <Button Content="Clear ticks" Style="{StaticResource GhostButton}" Click="OnClear"/>
+        </StackPanel>
+        <TextBlock x:Name="ProgressText" VerticalAlignment="Center" TextWrapping="Wrap"/>
       </DockPanel>
     </Border>
   </Grid>

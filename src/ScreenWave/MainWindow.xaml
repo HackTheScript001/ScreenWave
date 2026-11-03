@@ -58,7 +58,8 @@
             <RadioButton Style="{StaticResource NavItem}" GroupName="nav" Tag="tips" Content="3. Speed-up settings" Checked="OnNav"/>
             <RadioButton Style="{StaticResource NavItem}" GroupName="nav" Tag="block" Content="4. Stop apps coming back" Checked="OnNav"/>
             <RadioButton Style="{StaticResource NavItem}" GroupName="nav" Tag="finish" Content="5. Finish up" Checked="OnNav"/>
-            <RadioButton Style="{StaticResource NavItem}" GroupName="nav" Tag="about" Content="About" Checked="OnNav" Margin="0,18,0,2"/>
+            <RadioButton Style="{StaticResource NavItem}" GroupName="nav" Tag="settings" Content="Settings" Checked="OnNav" Margin="0,18,0,2"/>
+            <RadioButton Style="{StaticResource NavItem}" GroupName="nav" Tag="about" Content="About" Checked="OnNav"/>
           </StackPanel>
         </DockPanel>
       </Border>

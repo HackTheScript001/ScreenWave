@@ -10,6 +10,12 @@
 #define MyAppExe "ScreenWave.exe"
 #define PublishDir "..\publish"
 
+; Everything that ISN'T your own network: ScreenWave and sdb are blocked from reaching these.
+; Allowed: 10.x, 172.16-31.x, 192.168.x, 169.254.x, 127.x (this PC), and private/link-local IPv6.
+#define PublicV4 "0.0.0.0-9.255.255.255,11.0.0.0-126.255.255.255,128.0.0.0-169.253.255.255,169.255.0.0-172.15.255.255,172.32.0.0-192.167.255.255,192.169.0.0-255.255.255.255"
+#define PublicV6 "::2-fbff:ffff:ffff:ffff:ffff:ffff:ffff:ffff,fe00::-fe7f:ffff:ffff:ffff:ffff:ffff:ffff:ffff,fec0::-ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff"
+#define FwName "ScreenWave - local network only"
+
 [Setup]
 AppId={{3F6C2B7E-9A41-4D8E-B2C5-7E1A9D4F6B20}
 AppName={#MyAppName}
@@ -63,11 +69,18 @@ Name: "{autoprograms}\{#MyAppName}"; Filename: "{app}\{#MyAppExe}"
 Name: "{autodesktop}\{#MyAppName}"; Filename: "{app}\{#MyAppExe}"; Tasks: desktopicon
 
 [Run]
-Filename: "{app}\{#MyAppExe}"; Description: "{cm:LaunchProgram,{#MyAppName}}"; Flags: nowait postinstall skipifsilent
+; Windows Firewall: ScreenWave and sdb can only ever talk to your local network, never the internet
+Filename: "{sys}\netsh.exe"; Parameters: "advfirewall firewall delete rule name=""{#FwName}"""; Flags: runhidden; StatusMsg: "Locking ScreenWave to your local network..."
+Filename: "{sys}\netsh.exe"; Parameters: "advfirewall firewall add rule name=""{#FwName}"" dir=out action=block program=""{app}\ScreenWave.exe"" remoteip={#PublicV4},{#PublicV6} enable=yes profile=any"; Flags: runhidden
+Filename: "{sys}\netsh.exe"; Parameters: "advfirewall firewall add rule name=""{#FwName}"" dir=in action=block program=""{app}\ScreenWave.exe"" remoteip={#PublicV4},{#PublicV6} enable=yes profile=any"; Flags: runhidden
+Filename: "{sys}\netsh.exe"; Parameters: "advfirewall firewall add rule name=""{#FwName}"" dir=out action=block program=""{app}\sdb\sdb.exe"" remoteip={#PublicV4},{#PublicV6} enable=yes profile=any"; Flags: runhidden
+Filename: "{sys}\netsh.exe"; Parameters: "advfirewall firewall add rule name=""{#FwName}"" dir=in action=block program=""{app}\sdb\sdb.exe"" remoteip={#PublicV4},{#PublicV6} enable=yes profile=any"; Flags: runhidden
+Filename: "{app}\{#MyAppExe}"; Description: "{cm:LaunchProgram,{#MyAppName}}"; Flags: nowait postinstall skipifsilent shellexec
 
 [UninstallRun]
 ; Make sure sdb's helper isn't left running
 Filename: "{app}\sdb\sdb.exe"; Parameters: "kill-server"; Flags: runhidden skipifdoesntexist; RunOnceId: "KillSdb"
+Filename: "{sys}\netsh.exe"; Parameters: "advfirewall firewall delete rule name=""{#FwName}"""; Flags: runhidden; RunOnceId: "RemoveFirewall"
 
 [UninstallDelete]
 Type: filesandordirs; Name: "{app}"

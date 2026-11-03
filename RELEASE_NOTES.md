@@ -1,3 +1,10 @@
+What's new in 1.1.0
+- Remove apps now reads the app list from 2021 and newer TVs, and shows how often each app has been opened. Apps that have never been opened are suggested for removal.
+- Do it for me: connect ScreenWave as a remote (the TV asks you to Allow it once), teach a setting once with the on-screen remote, and ScreenWave repeats it for you on any TV in the same model range. Recordings stay on your PC and can be exported to a file.
+- Settings: add your AdGuard Home or Pi-hole address, and Stop apps coming back can add the block list for you and open the page so you can see it. Your existing rules are kept. Passwords are only saved if you choose, encrypted for your Windows account.
+- Firewall lock: the installer adds Windows Firewall rules so ScreenWave and Samsung's sdb can only reach your local network – never the internet. About shows that it's on.
+- App names with symbols (like Tubi's) now show correctly.
+
 What's new in 1.0.1
 - Clearer steps for turning on the TV's Developer Mode: what to press, what you'll see on the TV, and this PC's number shown big to type in.
 

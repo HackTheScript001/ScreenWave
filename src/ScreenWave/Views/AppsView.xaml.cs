@@ -16,6 +16,14 @@ public sealed class AppRow : ObservableItem
     public bool CanRemove => App.Kind == AppKind.Removable && Status != "Removed";
     public string KindText => App.Kind == AppKind.Removable ? "Can be removed" : "Samsung system – left alone";
     public string SuggestedText => App.Suggested ? "Suggested" : "";
+    public int UseSort => App.UseCount ?? -1;
+    public string UsedText => App.UseCount switch
+    {
+        null => "",
+        0 => "Never",
+        1 => "Once",
+        var n => $"{n} times",
+    };
 
     public void MarkRemoved()
     {

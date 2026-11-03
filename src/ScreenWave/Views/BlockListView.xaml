@@ -5,11 +5,26 @@
     <StackPanel Margin="24,18,24,18" MaxWidth="860" HorizontalAlignment="Left">
       <TextBlock Text="Stop apps coming back" Style="{StaticResource PageTitle}"/>
       <TextBlock Style="{StaticResource PageSub}"
-                 Text="Samsung can quietly reinstall preloaded apps after an update. Blocking these addresses on your network stops that. This happens on your own router or AdGuard Home / Pi-hole – ScreenWave doesn't change anything on your network."/>
+                 Text="Samsung can quietly reinstall preloaded apps after an update. Blocking these addresses on your own AdGuard Home, Pi-hole or router stops that. ScreenWave only changes your blocker if you click Add them for me."/>
 
-      <Border Style="{StaticResource Card}" Margin="0,16,0,0" Padding="20,16">
+      <!-- One click: add to the person's own blocker -->
+      <Border Style="{StaticResource Card}" Background="{StaticResource BlueSoft}" Margin="0,16,0,0" Padding="20,16">
         <StackPanel>
-          <TextBlock Text="Addresses to block" FontSize="15" FontWeight="SemiBold"/>
+          <TextBlock Text="Add them for me" FontSize="15" FontWeight="SemiBold"/>
+          <TextBlock TextWrapping="Wrap" Foreground="{StaticResource Grey}" Margin="0,4,0,0"
+                     Text="Set up your AdGuard Home or Pi-hole address in Settings, then ScreenWave adds the block list and opens the page so you can see it. Your existing rules are kept."/>
+          <StackPanel Orientation="Horizontal" Margin="-8,12,0,0">
+            <Button x:Name="AdGuardButton" Content="Add to AdGuard Home" Style="{StaticResource PrimaryButton}" Click="OnAddAdGuard"/>
+            <Button x:Name="PiHoleButton" Content="Add to Pi-hole" Style="{StaticResource PrimaryButton}" Click="OnAddPiHole"/>
+            <Button Content="Settings" Style="{StaticResource GhostButton}" Click="OnSettings"/>
+          </StackPanel>
+          <TextBlock x:Name="AddText" TextWrapping="Wrap" Margin="0,10,0,0"/>
+        </StackPanel>
+      </Border>
+
+      <Border Style="{StaticResource Card}" Margin="0,12,0,0" Padding="20,16">
+        <StackPanel>
+          <TextBlock Text="Or copy them yourself" FontSize="15" FontWeight="SemiBold"/>
           <TextBox x:Name="DomainBox" IsReadOnly="True" FontFamily="Consolas" FontSize="13" Margin="0,10,0,0"
                    TextWrapping="NoWrap" AcceptsReturn="True" Background="White" BorderBrush="{StaticResource Line}" Padding="8"/>
           <StackPanel Orientation="Horizontal" Margin="-8,12,0,0">

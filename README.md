@@ -18,7 +18,9 @@ Developer Mode, over your local network or a cable straight from your PC.
 
 ## Privacy
 
-ScreenWave never connects to the internet. It only talks to your TV's private local address.
+ScreenWave never connects to the internet. It only talks to private local addresses – your TV, and your own
+AdGuard Home or Pi-hole if you set one up. The installer also adds Windows Firewall rules that block ScreenWave and
+Samsung's sdb from every internet address.
 Nothing about you, your TV or your apps is sent to SecondWave IT Systems, GitHub or anyone else –
 there's no update check and no tracking. Its log, list of removed apps and checklist stay on your PC
 in `%LocalAppData%\ScreenWave`.

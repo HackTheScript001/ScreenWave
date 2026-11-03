@@ -65,6 +65,7 @@ public partial class MainWindow : Window
                 "block" => new BlockListView(),
                 "finish" => new FinishView(),
                 "about" => new AboutView(),
+                "settings" => new SettingsView(),
                 _ => new ConnectView(),
             };
             _pages[key] = page;

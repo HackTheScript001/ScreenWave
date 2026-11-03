@@ -20,12 +20,14 @@
         <StackPanel>
           <TextBlock Text="Your privacy" FontSize="15" FontWeight="SemiBold"/>
           <TextBlock TextWrapping="Wrap" Margin="0,6,0,0" LineHeight="21">
-            <Run Text="•  ScreenWave never connects to the internet. It only talks to your TV's address on your own network (or the cable)."/><LineBreak/>
-            <Run Text="•  It only connects to private local addresses (192.168.x.x, 10.x.x.x, 172.16–31.x.x)."/><LineBreak/>
-            <Run Text="•  Nothing about you, your TV or your apps is sent to SecondWave IT Systems, GitHub or anyone else. There's no update check and no tracking."/><LineBreak/>
-            <Run Text="•  Its log, list of removed apps and checklist stay on this PC in your user folder."/><LineBreak/>
-            <Run Text="•  When you close it, it stops Samsung's sdb helper so nothing is left running."/>
+            <Run Text="•  ScreenWave never connects to the internet. It only connects to private local addresses (192.168.x.x, 10.x.x.x, 172.16–31.x.x) and refuses anything else."/><LineBreak/>
+            <Run Text="•  The installer adds Windows Firewall rules so ScreenWave and Samsung's sdb are blocked from every internet address – even if something tried, it couldn't get out."/><LineBreak/>
+            <Run Text="•  Nothing about you, your TV, your apps or your network is sent to SecondWave IT Systems, GitHub or anyone else. No update check, no tracking."/><LineBreak/>
+            <Run Text="•  The only connections it makes: to your TV (Developer Mode on port 26101, the remote on 8001/8002), to your own AdGuard Home or Pi-hole if you set one up, and Find my TV briefly checking your own network for port 26101."/><LineBreak/>
+            <Run Text="•  Its log, recordings, settings and list of removed apps stay on this PC. Saved passwords are encrypted for your Windows account."/><LineBreak/>
+            <Run Text="•  When you close it, it stops sdb's helper so nothing is left running."/>
           </TextBlock>
+          <TextBlock x:Name="FirewallText" Margin="0,10,0,0" FontWeight="SemiBold" TextWrapping="Wrap"/>
           <StackPanel Orientation="Horizontal" Margin="-8,12,0,0">
             <Button Content="Open ScreenWave's files" Style="{StaticResource GhostButton}" Click="OnOpenData"/>
           </StackPanel>

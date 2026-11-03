@@ -31,6 +31,8 @@ public static class Sdb
             CreateNoWindow = true,
             RedirectStandardOutput = true,
             RedirectStandardError = true,
+            StandardOutputEncoding = System.Text.Encoding.UTF8,
+            StandardErrorEncoding = System.Text.Encoding.UTF8,
             WorkingDirectory = Path.GetDirectoryName(ExePath)!,
         };
         foreach (var a in argList) psi.ArgumentList.Add(a);

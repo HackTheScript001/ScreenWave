@@ -13,7 +13,7 @@
     <StackPanel Grid.Row="0" Margin="24,18,24,8">
       <TextBlock Text="Remove apps" Style="{StaticResource PageTitle}"/>
       <TextBlock Style="{StaticResource PageSub}"
-                 Text="Apps the TV allows to be removed can be ticked. Samsung's own system apps are left alone – removing those can break the home screen. Removed apps can be reinstalled from the TV's Apps store."/>
+                 Text="Apps the TV allows to be removed can be ticked. Opened shows how often each has been used on this TV. Samsung's own system apps are left alone – removing those can break the home screen. Removed apps can be reinstalled from the TV's Apps store."/>
     </StackPanel>
 
     <DockPanel Grid.Row="1" Margin="24,4,24,8">
@@ -43,6 +43,7 @@
               </DataTemplate>
             </DataGridTemplateColumn.CellTemplate>
           </DataGridTemplateColumn>
+          <DataGridTextColumn Header="Opened" Binding="{Binding UsedText, Mode=OneWay}" Width="100" IsReadOnly="True" SortMemberPath="UseSort"/>
           <DataGridTextColumn Header="Type" Binding="{Binding KindText, Mode=OneWay}" Width="1.2*" IsReadOnly="True"/>
           <DataGridTextColumn Header="Suggested" Binding="{Binding SuggestedText, Mode=OneWay}" Width="110" IsReadOnly="True"/>
           <DataGridTextColumn Header="Status" Binding="{Binding Status, Mode=OneWay}" Width="1.2*" IsReadOnly="True"/>

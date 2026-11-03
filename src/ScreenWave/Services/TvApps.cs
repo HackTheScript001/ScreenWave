@@ -10,7 +10,7 @@ public enum AppKind
     Core,        // part of Samsung's system – never touched
 }
 
-public sealed record TvApp(string Id, string Title, AppKind Kind, bool Suggested, IReadOnlyDictionary<string, string> Fields);
+public sealed record TvApp(string Id, string Title, AppKind Kind, bool Suggested, int? UseCount, IReadOnlyDictionary<string, string> Fields);
 
 public sealed record RemovedApp(string Title, string Id, DateTime When, string Tv);
 
@@ -25,9 +25,10 @@ public static class TvApps
     [
         "Rakuten", "Facebook", "Samsung Promotion", "Samsung Health", "Samsung Daily", "Art Store",
         "Alexa", "Samsung Kids", "Samsung TV Plus Kids", "Gallery", "Samsung Food", "SmartThings Find",
+        "QVC", "Security Center", "ROXi", "Tubi",
     ];
 
-    private static readonly string[] IdKeys = ["app_tizen_id", "app_id", "appid", "tizen_id", "package_id", "pkgid", "id"];
+    private static readonly string[] IdKeys = ["app_id", "appid", "app_tizen_id", "tizen_id", "package_id", "pkgid", "id"];
     private static readonly string[] TitleKeys = ["app_title", "title", "app_name", "name", "label"];
 
     public static async Task<(List<TvApp> Apps, string Raw)> ListAsync(string serial)
@@ -58,6 +59,9 @@ public static class TvApps
         {
             var line = raw.Trim();
             if (line.Length == 0 || Regex.IsMatch(line, @"^[-=_*]{5,}$")) { Flush(); continue; }
+            // 2021+ TVs wrap each line in dashes: "--------------app_title   =Netflix-------------"
+            line = Regex.Replace(line, @"^-{3,}|-{3,}$", "").Trim();
+            if (line.Length == 0) continue;
 
             var m = Regex.Match(line, @"^([A-Za-z_][A-Za-z0-9_ ]*?)\s*[=:]\s*(.*)$");
             if (!m.Success) continue;
@@ -76,8 +80,11 @@ public static class TvApps
             var title = TitleKeys.Select(k => rec.TryGetValue(k, out var v) ? v : null).FirstOrDefault(v => !string.IsNullOrWhiteSpace(v)) ?? id;
 
             var kind = IsCore(id, rec) ? AppKind.Core : AppKind.Removable;
-            var suggested = kind == AppKind.Removable && SuggestedTitles.Any(s => title.Contains(s, StringComparison.OrdinalIgnoreCase));
-            apps.Add(new TvApp(id, title, kind, suggested, rec));
+            int? uses = rec.TryGetValue("use_count", out var u) && int.TryParse(u, out var n) ? n : null;
+            // Suggest known promo apps, and anything the TV says has never been opened
+            var suggested = kind == AppKind.Removable &&
+                            (SuggestedTitles.Any(t => title.Contains(t, StringComparison.OrdinalIgnoreCase)) || uses == 0);
+            apps.Add(new TvApp(id, title, kind, suggested, uses, rec));
         }
 
         return apps
@@ -88,11 +95,12 @@ public static class TvApps
 
     private static bool IsCore(string id, Dictionary<string, string> rec)
     {
-        if (id.StartsWith("org.tizen", StringComparison.OrdinalIgnoreCase) ||
-            id.StartsWith("com.samsung", StringComparison.OrdinalIgnoreCase)) return true;
-
+        // The TV's own flag decides (Netflix is org.tizen.netflix-app but is_removable=1)
         if (rec.TryGetValue("is_removable", out var r) || rec.TryGetValue("removable", out r))
             return !(r == "1" || r.Equals("true", StringComparison.OrdinalIgnoreCase) || r.Equals("yes", StringComparison.OrdinalIgnoreCase));
+
+        if (id.StartsWith("org.tizen", StringComparison.OrdinalIgnoreCase) ||
+            id.StartsWith("com.samsung", StringComparison.OrdinalIgnoreCase)) return true;
 
         // No flag: only store-style IDs (long numbers, e.g. 3201910019365) count as removable
         return !Regex.IsMatch(id, @"^\d{8,}(\.\w+)?$");
